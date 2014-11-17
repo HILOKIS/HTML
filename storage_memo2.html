@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head><body>
+<h1>ローカル自動保存メモ</h1>
+<div id="msg_div"></div>
+<textarea id="main_txt" cols="80" rows="30"></textarea>
+<script type="text/javascript">
+
+	var main_txt = document.getElementById("main_txt")
+	var msg_div = document.getElementById("msg_div")
+	
+	window.onload = function(){
+	
+	var body =localStorage.getItem("memo");
+	if(bpdy != null){
+	main_txt.value = body;
+	}
+	};
+	
+	main_txt.onchange = function(){
+	
+	localStorage.setItem("memo", main_txt.value);
+	msg_div.innerHTML = "saved" + new Date().toString();
+	};
+</script>
+</body></html>

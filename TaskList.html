@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+</head><body>
+<pre>
+'TaskList
+
+Sub getNumber()
+
+Dim data(5) As String
+Dim NUMBER As String
+Dim WB1 As Workbook, WB2 As Workbook
+Dim SELECTCELL As Range, LASTCELL As Range
+
+
+'案件受付表のパス
+Const ankenFile = ""
+'契約データフォルダのパス
+Const Address = ""
+Set WB1 = ActiveWorkbook
+
+'データを格納
+Set SELECTCELL = ActiveCell
+data(0) = SELECTCELL.Offset().Value      '案件名
+data(1) = SELECTCELL.Offset(0, 1).Value  '営業所名
+data(2) = SELECTCELL.Offset(0, 2).Value  '担当者名
+
+
+
+'共有ファイルに書き込める状態かをチェック
+On Error Resume Next
+    Open ankenFile For Append As #1
+    Close #1
+    If Err.NUMBER > 0 Then
+        MsgBox "すでに開かれています"
+        Exit Sub
+    Else
+              
+        Set WB2 = Workbooks.Open(ankenFile)
+        WB2.shets(1).Select
+        Set LASTCELL = Range("C3").End(xlDown)
+        
+        With LASTCELL
+            data(3) = .Offset(1, 1) '案件番号を取得
+            .Offset() = data(0)     '日付
+            .Offset() = data(1)  '鈴木
+            .Offset() = data(1)  '部署
+            .Offset() = data(1) '担当者
+            .Offset() = data(1)
+        End With
+        
+        'WB2.Save
+        
+        With SELECTCELL
+            .Offset(1, 0) = data(3)
+        End With
+        
+        WB1.Save
+        
+        '契約データにフォルダを作成
+        If Dir(Address & "\" & data(3), vbDirectory) = "" Then MkDir Address & "\" & data(3)
+    
+        '付属ファイルを契約データフォルダに移す
+    
+    End If
+End Sub
+Sub samaple4()
+'ダブルクリック
+
+If ActiveCell.Value = "" Then
+
+
+Else
+    Dim NUM As String
+    Dim WB As Workbook
+    
+        NUM = mid(ActiveCell.Value, 5)
+    
+        WB = Workbooks.Open("")
+        WB.Sheets("").Range("") = NUM
+End If
+End Sub
+</pre>
+</body>
+</html>

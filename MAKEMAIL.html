@@ -1,0 +1,114 @@
+<html>
+<meta char=utf-8>
+<head>MAKEMAIL
+</head>
+<body>
+Sub makeMail()
+
+'メール本文
+Const stmsg As String = "" & vbCrLf & ""
+
+
+Dim strFileName As String
+Dim stAttachment As String
+
+    On Error GoTo errorhandling
+    Application.ScreenUpdating = False
+  
+Dim stSubject As String
+Dim A As String, B As String, C As String, D As String
+  
+'エクセルファイル操作
+Dim WB As Workbook
+Dim WS As Worksheet
+Dim InLastRow As Long
+
+    Set WB = ActiveWorkbook
+    With WB
+    
+        With .Sheets(1)
+    
+            'ロックをかけて
+            .Sheets(1).Protect Password:="7397mkj"
+            .EnableSelection = xlUnlockedCells
+            
+            '件名を作成
+            D = .Range("X6") & "-" & .Range("AA6")
+            A = "【契" & D & "回答" & Format(Date, "yymmdd")
+            B = .Range("H12")
+            C = "(" & .Range("G10") & ")"
+            stSubject = A & B & C
+            
+        
+        End With
+        
+        '契約データフォルダにフォルダがなければ作る
+        
+        
+        '現在のファイル名に契約データ保存場所のパスに名前変更
+        .SaveAs Filename:="\\Ts-xhl2cc\法務部共有\【001】契約書データ\55期（2014年度）\" & D & WB.Name
+        
+        '契約フォルダにファイルコピー
+       ' FileCopy WB, "C:\Work\Sub\Book1.xls"
+        
+        .Close
+    End With
+      
+'アウトルック操作
+Dim olApp As outlook.Application
+Dim olNameSpace As outlook.Namespace
+Dim olInbox As outlook.mapifolder
+Dim olNewMail As outlook.MailItem
+Dim incounter As Long
+    
+    'アウトルックを格納ＯＲ起動
+    Set olApp = GetObject(, "Outlook.Application")
+    If olApp Is Nothing Then
+        Set olApp = New outlook.Application
+        Set olNameSpace = olApp.GetNamespace("MAPI")
+        Set olInbox = olNameSpace.GetDefaultFolder(olFolderInbox)
+        olInbox.display
+    End If
+    
+    
+    Set olNewMail = olApp.CreateItem(olMailItem)
+    With olNewMail
+        
+        '.importance
+        
+        .Subject = stSubject
+       
+       ' .Recipients.Add '宛先追加　シートの依頼人を参照
+        
+        .body = stmsg
+        
+        
+        With .Attachments
+            .Add WB.FullName
+            .Item(1).DisplayName = WB.Name
+        End With
+        
+        .display
+        '.Save
+    End With
+    
+    'Kill stAttachment
+    
+exitsub:
+    Set olNewMail = Nothing
+    Set olInbox = Nothing
+    Set olNameSpace = Nothing
+    Set olApp = Nothing
+    Exit Sub
+    
+errorhandling:
+    
+    If Err.NUMBER = 429 Then
+        Resume Next
+    Else
+        MsgBox "" & Err.NUMBER & vbNewLine & Err.Description, vbOKOnly
+        Resume exitsub
+    End If
+
+End Sub
+</body>
